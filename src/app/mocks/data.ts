@@ -1417,8 +1417,3 @@ export const MOCK_DATA: ListResponse<AnimalEvent> = {
       "reportingDateTime": 1514389084
     }]
 }
-
-// /events - GET
-// /events/eventId - POST (PATCH)? - return updated row
-// /events - POST
-// /events/eventId - DELETE

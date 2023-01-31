@@ -1,4 +1,5 @@
 table {
+  position: relative;
   font-family: arial, sans-serif;
   border-collapse: collapse;
   width: 100%;
@@ -8,4 +9,13 @@ td, th {
   border: 1px solid #dddddd;
   text-align: left;
   padding: 8px;
+}
+
+.overlay {
+  position: absolute;
+  right: 0;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.15);
 }

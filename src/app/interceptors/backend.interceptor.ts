@@ -8,7 +8,7 @@ import {
 } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { delay, Observable, of, tap } from "rxjs";
-import { EditEventPayload, HttpMethods } from "../models";
+import { AnimalEvent, EditEventPayload, HttpMethods } from "../models";
 import { MOCK_DATA } from "../mocks/data";
 
 const HTTP_CALL_DELAY = 300;
@@ -29,7 +29,7 @@ class BackendInterceptor implements HttpInterceptor {
       }
 
       if (method === HttpMethods.Post) {
-        return this.addEvent();
+        return this.addEvent(body);
       }
     }
 
@@ -52,8 +52,14 @@ class BackendInterceptor implements HttpInterceptor {
     return this.returnResult(data);
   }
 
-  private addEvent(): Observable<HttpEvent<any>> {
-    return this.returnResult(null);
+  private addEvent(event: AnimalEvent): Observable<HttpEvent<any>> {
+    return this.returnResult(data, () => {
+      data.total += 1;
+      data.result.unshift({
+        ...event,
+        eventId: (data.result[0]?.eventId ?? 0) + 1,
+      });
+    });
   }
 
   private deleteEvent(id: string | undefined): Observable<HttpEvent<any>> {
@@ -65,6 +71,7 @@ class BackendInterceptor implements HttpInterceptor {
     }
 
     return this.returnResult(data, () => {
+      data.total -= 1;
       data.result = [...data.result.slice(0, index), ...data.result.slice(index + 1)]
     });
   }

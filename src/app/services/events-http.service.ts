@@ -16,7 +16,7 @@ export class EventsHttpService {
     return this.http.get<ListResponse<AnimalEvent>>(this.apiPrefix)
   }
 
-  addEvent(event: AnimalEvent): Observable<AnimalEvent> {
+  addEvent(event: Partial<AnimalEvent>): Observable<AnimalEvent> {
     return this.http.post<AnimalEvent>('/events', event)
   }
 

@@ -22,7 +22,7 @@ export class EventsFacadeService {
     })
   }
 
-  addEvent(event: AnimalEvent): void {
+  addEvent(event: Partial<AnimalEvent>): void {
     this.store.setIsLoading(true);
     this.http.addEvent(event)
       .pipe(

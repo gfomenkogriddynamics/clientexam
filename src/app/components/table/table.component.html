@@ -1,7 +1,10 @@
 <ng-container *ngIf="{
   isLoading: eventsFacadeService.isLoading$ | async,
-  events: eventsFacadeService.events$ | async
+  events: eventsFacadeService.events$ | async,
+  editableCell: editableCell$ | async
 } as data">
+  <i *ngIf="data.isLoading">Loading...</i>
+
   <table>
     <thead>
     <tr>
@@ -12,12 +15,22 @@
     </thead>
     <tbody>
     <tr *ngFor="let event of data.events">
-      <td *ngFor="let key of tableKeys">
-        {{event[key]}}
+      <td>
+        <button style="color: red" (click)="deleteRow(event.eventId)">del</button>
+      </td>
+      <td *ngFor="let key of tableKeys" (click)="enterEditMode(event, key)">
+        <ng-container
+          *ngIf="data.editableCell && data.editableCell.eventId === event.eventId && data.editableCell.key === key; else defaultView">
+          <input type="text" appFocusOnRender [(ngModel)]="inputValue"/>
+          <button (click)="saveCell($event, event, key)" [disabled]="inputValue === event[key]">ok</button>
+          <button (click)="leaveEditMode($event)">x</button>
+        </ng-container>
+
+        <ng-template #defaultView>
+          {{event[key]}}
+        </ng-template>
       </td>
     </tr>
     </tbody>
   </table>
-
-  <i *ngIf="data.isLoading">Loading events...</i>
 </ng-container>

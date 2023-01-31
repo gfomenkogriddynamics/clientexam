@@ -7,12 +7,12 @@ import {
   HttpResponse
 } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { delay, Observable, of } from "rxjs";
-import { HttpMethods } from "../models";
+import { delay, Observable, of, tap } from "rxjs";
+import { EditEventPayload, HttpMethods } from "../models";
 import { MOCK_DATA } from "../mocks/data";
 
 const HTTP_CALL_DELAY = 300;
-
+let data = MOCK_DATA;
 // /events - GET
 // /events/eventId - PATCH
 // /events - POST
@@ -21,7 +21,7 @@ const HTTP_CALL_DELAY = 300;
 @Injectable()
 class BackendInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const { url, method } = req;
+    const { url, method, body } = req;
 
     if (url.endsWith('/events')) {
       if (method === HttpMethods.Get) {
@@ -34,12 +34,14 @@ class BackendInterceptor implements HttpInterceptor {
     }
 
     if (url.match(/\/events\/\d+$/)) {
+      const id = url.match(/\d+/)?.[0];
+
       if (method === HttpMethods.Patch) {
-        return this.editEvent();
+        return this.editEvent(id, body);
       }
 
       if (method === HttpMethods.Delete) {
-        return this.deleteEvent();
+        return this.deleteEvent(id);
       }
     }
 
@@ -47,24 +49,44 @@ class BackendInterceptor implements HttpInterceptor {
   }
 
   private getEvents(): Observable<HttpEvent<any>> {
-    return this.returnResult(MOCK_DATA);
+    return this.returnResult(data);
   }
 
   private addEvent(): Observable<HttpEvent<any>> {
     return this.returnResult(null);
   }
 
-  private deleteEvent(): Observable<HttpEvent<any>> {
-    return this.returnResult(null);
+  private deleteEvent(id: string | undefined): Observable<HttpEvent<any>> {
+    const index = data.result.findIndex(event => event.eventId.toString() === id);
+
+    if (index === -1) {
+      // error handling here
+      return this.returnResult(null);
+    }
+
+    return this.returnResult(data, () => {
+      data.result = [...data.result.slice(0, index), ...data.result.slice(index + 1)]
+    });
   }
 
-  private editEvent(): Observable<HttpEvent<any>> {
-    return this.returnResult(null);
+  private editEvent(id: string | undefined, { key, value }: EditEventPayload): Observable<HttpEvent<any>> {
+    const event = data.result.find(event => event.eventId.toString() === id);
+
+    if (!event) {
+      // error handling here
+      return this.returnResult(null);
+    }
+
+    return this.returnResult(data, () => {
+      event[key] = value;
+    });
   }
 
-  private returnResult(body: any) {
+  private returnResult(body: any, modifyDataFunc?: () => void) {
     return of(new HttpResponse({ status: 200, body }))
-      .pipe(delay(HTTP_CALL_DELAY));
+      .pipe(delay(HTTP_CALL_DELAY), tap(() => {
+        modifyDataFunc?.();
+      }));
   }
 }
 

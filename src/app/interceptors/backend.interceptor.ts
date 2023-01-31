@@ -13,10 +13,6 @@ import { MOCK_DATA } from "../mocks/data";
 
 const HTTP_CALL_DELAY = 300;
 let data = MOCK_DATA;
-// /events - GET
-// /events/eventId - PATCH
-// /events - POST
-// /events/eventId - DELETE
 
 @Injectable()
 class BackendInterceptor implements HttpInterceptor {

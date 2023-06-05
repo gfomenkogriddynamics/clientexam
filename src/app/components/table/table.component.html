@@ -22,7 +22,7 @@
     <tbody>
     <tr *ngIf="data.isAddingNewRow">
       <td>
-        <button style="color: green" (click)="saveRow()">Save</button>
+        <button (click)="saveRow()">Save</button>
         <button (click)="leaveAddNewRowMode()">x</button>
       </td>
       <td *ngFor="let key of tableKeys">
@@ -34,7 +34,7 @@
 
     <tr *ngFor="let event of data.events">
       <td>
-        <button style="color: red" (click)="deleteRow(event.eventId)">del</button>
+        <button (click)="deleteRow(event.eventId)">del</button>
       </td>
 
       <td *ngFor="let key of tableKeys" (click)="enterEditMode(event, key)">
